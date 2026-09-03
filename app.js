@@ -8,6 +8,9 @@ const percentFormatter = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 2,
 });
 
+const KOBRA_X_POWER_W = 400;
+const RGE_SANTA_MARIA_RATE_PER_KWH = 1.3461;
+
 const fields = {
   pieceWeight: document.getElementById("pieceWeight"),
   filamentConsumption: document.getElementById("filamentConsumption"),
@@ -15,8 +18,6 @@ const fields = {
   filamentCostPerKg: document.getElementById("filamentCostPerKg"),
   printHours: document.getElementById("printHours"),
   printMinutes: document.getElementById("printMinutes"),
-  printerPowerW: document.getElementById("printerPowerW"),
-  energyRate: document.getElementById("energyRate"),
   salesFeePercent: document.getElementById("salesFeePercent"),
   packagingCost: document.getElementById("packagingCost"),
   extraCost: document.getElementById("extraCost"),
@@ -38,6 +39,8 @@ const outputs = {
   warning: document.getElementById("warning"),
   donut: document.getElementById("costDonut"),
   legend: document.getElementById("legend"),
+  fixedPowerOut: document.getElementById("fixedPowerOut"),
+  fixedRateOut: document.getElementById("fixedRateOut"),
 };
 
 const defaults = {
@@ -47,8 +50,6 @@ const defaults = {
   filamentCostPerKg: 79.9,
   printHours: 8,
   printMinutes: 30,
-  printerPowerW: 180,
-  energyRate: 1.0,
   salesFeePercent: 16.4,
   packagingCost: 1.2,
   extraCost: 0.0,
@@ -91,8 +92,6 @@ function readForm() {
     filamentCostPerKg: Math.max(0, toNumber(fields.filamentCostPerKg.value)),
     printHours: hours,
     printMinutes: minutes,
-    printerPowerW: Math.max(0, toNumber(fields.printerPowerW.value)),
-    energyRate: Math.max(0, toNumber(fields.energyRate.value)),
     salesFeePercent,
     packagingCost: Math.max(0, toNumber(fields.packagingCost.value)),
     extraCost: Math.max(0, toNumber(fields.extraCost.value)),
@@ -168,7 +167,8 @@ function calculate() {
   const effectiveConsumption =
     values.filamentConsumption > 0 ? values.filamentConsumption : values.pieceWeight;
   const filamentCost = (effectiveConsumption / 1000) * values.filamentCostPerKg;
-  const energyCost = (values.printerPowerW / 1000) * printTimeHours * values.energyRate;
+  const energyCost =
+    (KOBRA_X_POWER_W / 1000) * printTimeHours * RGE_SANTA_MARIA_RATE_PER_KWH;
   const directCost = filamentCost + energyCost + values.packagingCost + values.extraCost;
 
   const suggestedPrice = (directCost * (1 + profitRate)) / (1 - feeRate);
@@ -238,4 +238,6 @@ Object.values(fields).forEach((field) => {
 });
 
 loadState();
+outputs.fixedPowerOut.textContent = `${KOBRA_X_POWER_W} W`;
+outputs.fixedRateOut.textContent = `${money(RGE_SANTA_MARIA_RATE_PER_KWH)}/kWh`;
 calculate();

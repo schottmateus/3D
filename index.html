@@ -54,17 +54,13 @@
               Tempo de impressão (minutos)
               <input id="printMinutes" type="number" min="0" max="59" step="1" />
             </label>
-
-            <label>
-              Potência média da impressora (W)
-              <input id="printerPowerW" type="number" min="0" step="1" />
-            </label>
-
-            <label>
-              Tarifa de energia (R$/kWh)
-              <input id="energyRate" type="number" min="0" step="0.01" />
-            </label>
           </div>
+
+          <p class="fixed-info">
+            Energia calculada automaticamente com Anycubic Kobra X
+            (<strong id="fixedPowerOut"></strong>) e tarifa RGE Santa Maria/RS
+            (<strong id="fixedRateOut"></strong>).
+          </p>
 
           <h2>Custos e estratégia</h2>
 
