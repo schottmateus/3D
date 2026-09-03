@@ -25,3 +25,4 @@ Start-Process .\index.html
 - lucro estimado em valor e margem
 - preço sugerido e preço final ideal com regra de arredondamento
 - persistência dos dados preenchidos no navegador (localStorage)
+- cálculo de energia fixo para Anycubic Kobra X (400W) e tarifa RGE Santa Maria/RS (R$ 1,3461/kWh)
