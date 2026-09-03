@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de Precificação 3D</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <p class="badge">Precificação inteligente</p>
+        <h1>Calculadora completa para peças 3D</h1>
+        <p class="subtitle">Não venda mais sem lucro.</p>
+      </header>
+
+      <section class="layout">
+        <form id="pricing-form" class="panel form-panel" autocomplete="off">
+          <h2>Dados da impressão</h2>
+
+          <div class="grid">
+            <label>
+              Peso da peça (g)
+              <input id="pieceWeight" type="number" min="0" step="0.1" />
+            </label>
+
+            <label>
+              Consumo de filamento (g)
+              <input id="filamentConsumption" type="number" min="0" step="0.1" />
+            </label>
+
+            <label>
+              Tipo de filamento
+              <select id="filamentType">
+                <option>PLA</option>
+                <option>PETG</option>
+                <option>ABS</option>
+                <option>TPU</option>
+                <option>Outro</option>
+              </select>
+            </label>
+
+            <label>
+              Custo do filamento (R$/kg)
+              <input id="filamentCostPerKg" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Tempo de impressão (horas)
+              <input id="printHours" type="number" min="0" step="1" />
+            </label>
+
+            <label>
+              Tempo de impressão (minutos)
+              <input id="printMinutes" type="number" min="0" max="59" step="1" />
+            </label>
+
+            <label>
+              Potência média da impressora (W)
+              <input id="printerPowerW" type="number" min="0" step="1" />
+            </label>
+
+            <label>
+              Tarifa de energia (R$/kWh)
+              <input id="energyRate" type="number" min="0" step="0.01" />
+            </label>
+          </div>
+
+          <h2>Custos e estratégia</h2>
+
+          <div class="grid">
+            <label>
+              Taxas de venda (%)
+              <input id="salesFeePercent" type="number" min="0" max="99.99" step="0.01" />
+            </label>
+
+            <label>
+              Embalagem (R$)
+              <input id="packagingCost" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Outros custos (R$)
+              <input id="extraCost" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Lucro desejado (%)
+              <input id="desiredProfitPercent" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Arredondamento do preço final
+              <select id="roundingMode">
+                <option value="none">Sem arredondamento</option>
+                <option value="90">Terminar em ,90</option>
+                <option value="integer">Inteiro mais próximo</option>
+              </select>
+            </label>
+          </div>
+        </form>
+
+        <section class="panel result-panel">
+          <h2>Resumo da precificação</h2>
+
+          <div class="result-grid">
+            <article class="result-card">
+              <h3>Custos</h3>
+              <div class="line-item"><span>Filamento</span><strong id="filamentCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span>Energia</span><strong id="energyCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span>Taxas de venda</span><strong id="salesFeeOut">R$ 0,00</strong></div>
+              <div class="line-item"><span>Embalagem</span><strong id="packagingOut">R$ 0,00</strong></div>
+              <div class="line-item"><span>Outros custos</span><strong id="extraOut">R$ 0,00</strong></div>
+              <div class="line-item total"><span>Custo total</span><strong id="totalCostOut">R$ 0,00</strong></div>
+            </article>
+
+            <article class="result-card">
+              <h3>Distribuição</h3>
+              <div class="donut-wrap">
+                <div id="costDonut" class="donut" role="img" aria-label="Distribuição percentual de custos"></div>
+              </div>
+              <ul id="legend" class="legend"></ul>
+            </article>
+          </div>
+
+          <div class="price-strip">
+            <div class="metric">
+              <span>Lucro em valor</span>
+              <strong id="profitValueOut">R$ 0,00</strong>
+            </div>
+            <div class="metric">
+              <span>Margem estimada</span>
+              <strong id="profitMarginOut">0,00%</strong>
+            </div>
+            <div class="metric highlight">
+              <span>Preço sugerido</span>
+              <strong id="suggestedPriceOut">R$ 0,00</strong>
+            </div>
+            <div class="metric final">
+              <span>Preço final ideal</span>
+              <strong id="finalPriceOut">R$ 0,00</strong>
+            </div>
+          </div>
+
+          <p id="warning" class="warning" hidden></p>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
