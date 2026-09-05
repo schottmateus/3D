@@ -12,12 +12,10 @@ const KOBRA_X_POWER_W = 400;
 const RGE_SANTA_MARIA_RATE_PER_KWH = 1.3461;
 
 const fields = {
-  pieceWeight: document.getElementById("pieceWeight"),
   filamentConsumption: document.getElementById("filamentConsumption"),
   filamentType: document.getElementById("filamentType"),
   filamentCostPerKg: document.getElementById("filamentCostPerKg"),
   printHours: document.getElementById("printHours"),
-  printMinutes: document.getElementById("printMinutes"),
   salesFeePercent: document.getElementById("salesFeePercent"),
   packagingCost: document.getElementById("packagingCost"),
   extraCost: document.getElementById("extraCost"),
@@ -44,12 +42,10 @@ const outputs = {
 };
 
 const defaults = {
-  pieceWeight: 120,
   filamentConsumption: 120,
   filamentType: "PLA",
   filamentCostPerKg: 79.9,
   printHours: 8,
-  printMinutes: 30,
   salesFeePercent: 16.4,
   packagingCost: 1.2,
   extraCost: 0.0,
@@ -81,17 +77,14 @@ function percentage(value) {
 
 function readForm() {
   const hours = Math.max(0, Math.floor(toNumber(fields.printHours.value)));
-  const minutes = clamp(Math.floor(toNumber(fields.printMinutes.value)), 0, 59);
   const salesFeePercent = clamp(toNumber(fields.salesFeePercent.value), 0, 99.99);
   const desiredProfitPercent = Math.max(0, toNumber(fields.desiredProfitPercent.value));
 
   return {
-    pieceWeight: Math.max(0, toNumber(fields.pieceWeight.value)),
     filamentConsumption: Math.max(0, toNumber(fields.filamentConsumption.value)),
     filamentType: fields.filamentType.value,
     filamentCostPerKg: Math.max(0, toNumber(fields.filamentCostPerKg.value)),
     printHours: hours,
-    printMinutes: minutes,
     salesFeePercent,
     packagingCost: Math.max(0, toNumber(fields.packagingCost.value)),
     extraCost: Math.max(0, toNumber(fields.extraCost.value)),
@@ -151,7 +144,7 @@ function updateDonut(parts, total) {
 
 function calculate() {
   const values = readForm();
-  const printTimeHours = values.printHours + values.printMinutes / 60;
+  const printTimeHours = values.printHours;
   const feeRate = values.salesFeePercent / 100;
   const profitRate = values.desiredProfitPercent / 100;
 
@@ -164,9 +157,7 @@ function calculate() {
   outputs.warning.hidden = true;
   outputs.warning.textContent = "";
 
-  const effectiveConsumption =
-    values.filamentConsumption > 0 ? values.filamentConsumption : values.pieceWeight;
-  const filamentCost = (effectiveConsumption / 1000) * values.filamentCostPerKg;
+  const filamentCost = (values.filamentConsumption / 1000) * values.filamentCostPerKg;
   const energyCost =
     (KOBRA_X_POWER_W / 1000) * printTimeHours * RGE_SANTA_MARIA_RATE_PER_KWH;
   const directCost = filamentCost + energyCost + values.packagingCost + values.extraCost;
