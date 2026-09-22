@@ -210,7 +210,7 @@ h3 {
 
 .price-strip {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.7rem;
 }
 
@@ -245,6 +245,33 @@ h3 {
 .warning {
   margin: 0.8rem 0 0;
   color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.market-note {
+  margin-top: 0.95rem;
+  border: 1px solid #2a4a7a;
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: #0a1833;
+}
+
+.market-note h3 {
+  margin: 0 0 0.5rem;
+}
+
+.market-note p {
+  margin: 0 0 0.55rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.market-note ul {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--muted);
+  display: grid;
+  gap: 0.35rem;
   font-size: 0.9rem;
 }
 
