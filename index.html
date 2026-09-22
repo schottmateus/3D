@@ -41,18 +41,19 @@
             </label>
 
             <label>
-              Tempo de impressão (horas)
+              Tempo de impressão (horas inteiras)
               <input id="printHours" type="number" min="0" step="1" />
             </label>
           </div>
 
           <p class="fixed-info">
             Energia calculada automaticamente com Anycubic Kobra X
-            (<strong id="fixedPowerOut"></strong>) e tarifa RGE Santa Maria/RS
-            (<strong id="fixedRateOut"></strong>).
+            (<strong id="fixedPowerOut"></strong>), tarifa RGE Santa Maria/RS
+            (<strong id="fixedRateOut"></strong>) e valor da impressora fixo em
+            <strong id="fixedPrinterValueOut"></strong>.
           </p>
 
-          <h2>Custos e estratégia</h2>
+          <h2>Custos de operação</h2>
 
           <div class="grid">
             <label>
@@ -66,17 +67,51 @@
             </label>
 
             <label>
-              Outros custos (R$)
+              Outros custos variáveis (R$)
               <input id="extraCost" type="number" min="0" step="0.01" />
             </label>
 
             <label>
-              Lucro desejado (%)
+              Reserva inicial manutenção (R$)
+              <input id="maintenanceReserve" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Vida útil estimada (horas)
+              <input id="usefulLifeHours" type="number" min="1" step="1" />
+            </label>
+
+            <label>
+              Taxa de falhas/reimpressões (%)
+              <input id="failureRatePercent" type="number" min="0" step="0.01" />
+            </label>
+          </div>
+
+          <h2>Mão de obra e estratégia</h2>
+
+          <div class="grid">
+            <label>
+              Tempo manual (min)
+              <input id="manualWorkMinutes" type="number" min="0" step="1" />
+            </label>
+
+            <label>
+              Valor da hora (R$/h)
+              <input id="hourlyRate" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Lucro no preço sustentável (%)
               <input id="desiredProfitPercent" type="number" min="0" step="0.01" />
             </label>
 
             <label>
-              Arredondamento do preço final
+              Adicional personalizado/urgente (%)
+              <input id="customPremiumPercent" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Arredondamento dos preços
               <select id="roundingMode">
                 <option value="none">Sem arredondamento</option>
                 <option value="90">Terminar em ,90</option>
@@ -94,10 +129,13 @@
               <h3>Custos</h3>
               <div class="line-item"><span>Filamento</span><strong id="filamentCostOut">R$ 0,00</strong></div>
               <div class="line-item"><span>Energia</span><strong id="energyCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span>Máquina (depreciação)</span><strong id="machineCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span>Mão de obra</span><strong id="laborCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span>Falhas/reimpressões</span><strong id="failureCostOut">R$ 0,00</strong></div>
               <div class="line-item"><span>Taxas de venda</span><strong id="salesFeeOut">R$ 0,00</strong></div>
               <div class="line-item"><span>Embalagem</span><strong id="packagingOut">R$ 0,00</strong></div>
-              <div class="line-item"><span>Outros custos</span><strong id="extraOut">R$ 0,00</strong></div>
-              <div class="line-item total"><span>Custo total</span><strong id="totalCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span>Outros variáveis</span><strong id="extraOut">R$ 0,00</strong></div>
+              <div class="line-item total"><span>Custo total sustentável</span><strong id="totalCostOut">R$ 0,00</strong></div>
             </article>
 
             <article class="result-card">
@@ -111,21 +149,42 @@
 
           <div class="price-strip">
             <div class="metric">
-              <span>Lucro em valor</span>
+              <span>Preço mínimo</span>
+              <strong id="minimumPriceOut">R$ 0,00</strong>
+            </div>
+            <div class="metric highlight">
+              <span>Preço sustentável</span>
+              <strong id="sustainablePriceOut">R$ 0,00</strong>
+            </div>
+            <div class="metric final">
+              <span>Preço personalizado/urgente</span>
+              <strong id="customPriceOut">R$ 0,00</strong>
+            </div>
+            <div class="metric">
+              <span>Lucro no sustentável</span>
               <strong id="profitValueOut">R$ 0,00</strong>
             </div>
             <div class="metric">
-              <span>Margem estimada</span>
+              <span>Margem no sustentável</span>
               <strong id="profitMarginOut">0,00%</strong>
             </div>
-            <div class="metric highlight">
-              <span>Preço sugerido</span>
-              <strong id="suggestedPriceOut">R$ 0,00</strong>
+            <div class="metric">
+              <span>Custo máquina por hora</span>
+              <strong id="machineCostPerHourOut">R$ 0,00</strong>
             </div>
-            <div class="metric final">
-              <span>Preço final ideal</span>
-              <strong id="finalPriceOut">R$ 0,00</strong>
-            </div>
+          </div>
+
+          <div class="market-note">
+            <h3>Nota de mercado</h3>
+            <p>
+              O preço calculado garante sustentabilidade da operação, mas não garante aceitação do
+              mercado. Evite baixar margem automaticamente quando o preço parecer alto.
+            </p>
+            <ul>
+              <li>Revise tempo de acabamento, modelo e fluxo de entrega.</li>
+              <li>Avalie material, calibração da impressora e diferenciação do produto.</li>
+              <li>Use preço personalizado para urgência, alterações e risco técnico maior.</li>
+            </ul>
           </div>
 
           <p id="warning" class="warning" hidden></p>
