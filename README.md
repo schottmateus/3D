@@ -26,7 +26,7 @@ Start-Process .\index.html
 - cálculo automático em tempo real
 - resumo de custos por categoria
 - lucro estimado em valor e margem no preço sustentável
-- três preços de venda: mínimo, sustentável e personalizado/urgente
+- dois preços de venda: sustentável e personalizado/urgente
 - persistência dos dados preenchidos no navegador (localStorage)
 - cálculo de energia fixo para Anycubic Kobra X (400W) e tarifa RGE Santa Maria/RS (R$ 1,3461/kWh)
 - depreciação com valor fixo da impressora em R$ 3.500,00

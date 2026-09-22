@@ -40,7 +40,6 @@ const outputs = {
   packagingOut: document.getElementById("packagingOut"),
   extraOut: document.getElementById("extraOut"),
   totalCostOut: document.getElementById("totalCostOut"),
-  minimumPriceOut: document.getElementById("minimumPriceOut"),
   sustainablePriceOut: document.getElementById("sustainablePriceOut"),
   customPriceOut: document.getElementById("customPriceOut"),
   profitValueOut: document.getElementById("profitValueOut"),
@@ -202,7 +201,6 @@ function calculate() {
   const failureCost = sustainableBaseCost * failureRate;
   const sustainableCostWithFailures = sustainableBaseCost + failureCost;
 
-  const minimumPrice = applyRounding(priceFromNet(variableCost, salesFeeRate), values.roundingMode);
   const sustainableNetTarget = sustainableCostWithFailures * (1 + profitRate);
   const sustainablePrice = applyRounding(
     priceFromNet(sustainableNetTarget, salesFeeRate),
@@ -226,7 +224,6 @@ function calculate() {
   outputs.extraOut.textContent = money(values.extraCost);
   outputs.totalCostOut.textContent = money(sustainableTotalCost);
 
-  outputs.minimumPriceOut.textContent = money(minimumPrice);
   outputs.sustainablePriceOut.textContent = money(sustainablePrice);
   outputs.customPriceOut.textContent = money(customPrice);
   outputs.profitValueOut.textContent = money(sustainableProfitValue);
