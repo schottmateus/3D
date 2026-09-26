@@ -9,9 +9,7 @@
   <body>
     <main class="app">
       <header class="hero">
-        <p class="badge">Precificação inteligente</p>
-        <h1>Calculadora completa para peças 3D</h1>
-        <p class="subtitle">Não venda mais sem lucro.</p>
+        <h1>Calculadora de Custos de Impressão 3D</h1>
       </header>
 
       <section class="layout">
@@ -46,48 +44,7 @@
             </label>
           </div>
 
-          <p class="fixed-info">
-            Energia calculada automaticamente com Anycubic Kobra X
-            (<strong id="fixedPowerOut"></strong>), tarifa RGE Santa Maria/RS
-            (<strong id="fixedRateOut"></strong>) e valor da impressora fixo em
-            <strong id="fixedPrinterValueOut"></strong>.
-          </p>
-
-          <h2>Custos de operação</h2>
-
-          <div class="grid">
-            <label>
-              Taxas de venda (%)
-              <input id="salesFeePercent" type="number" min="0" max="99.99" step="0.01" />
-            </label>
-
-            <label>
-              Embalagem (R$)
-              <input id="packagingCost" type="number" min="0" step="0.01" />
-            </label>
-
-            <label>
-              Outros custos variáveis (R$)
-              <input id="extraCost" type="number" min="0" step="0.01" />
-            </label>
-
-            <label>
-              Reserva inicial manutenção (R$)
-              <input id="maintenanceReserve" type="number" min="0" step="0.01" />
-            </label>
-
-            <label>
-              Vida útil estimada (horas)
-              <input id="usefulLifeHours" type="number" min="1" step="1" />
-            </label>
-
-            <label>
-              Taxa de falhas/reimpressões (%)
-              <input id="failureRatePercent" type="number" min="0" step="0.01" />
-            </label>
-          </div>
-
-          <h2>Mão de obra e estratégia</h2>
+          <h2>Mão de Obra</h2>
 
           <div class="grid">
             <label>
@@ -99,26 +56,21 @@
               Valor da hora (R$/h)
               <input id="hourlyRate" type="number" min="0" step="0.01" />
             </label>
-
-            <label>
-              Lucro no preço sustentável (%)
-              <input id="desiredProfitPercent" type="number" min="0" step="0.01" />
-            </label>
-
-            <label>
-              Adicional personalizado/urgente (%)
-              <input id="customPremiumPercent" type="number" min="0" step="0.01" />
-            </label>
-
-            <label>
-              Arredondamento dos preços
-              <select id="roundingMode">
-                <option value="none">Sem arredondamento</option>
-                <option value="90">Terminar em ,90</option>
-                <option value="integer">Inteiro mais próximo</option>
-              </select>
-            </label>
           </div>
+
+          <p class="fixed-info">
+            Energia calculada automaticamente com Anycubic Kobra X
+            (<strong id="fixedPowerOut"></strong>), tarifa RGE Santa Maria/RS
+            (<strong id="fixedRateOut"></strong>) e valor da impressora fixo em
+            <strong id="fixedPrinterValueOut"></strong>. Depreciação considera
+            <strong id="fixedReserveOut"></strong> de reserva e
+            <strong id="fixedUsefulLifeOut"></strong> de vida útil. Falhas/reimpressões fixas em
+            <strong id="fixedFailureRateOut"></strong>. Regra do preço mínimo:
+            <strong id="fixedMinimumRuleOut"></strong>. Regra do preço de venda:
+            <strong id="fixedSaleRuleOut"></strong>. Regra do preço personalizado:
+            <strong id="fixedCustomRuleOut"></strong>. Arredondamento
+            <strong>inteiro mais próximo</strong>.
+          </p>
         </form>
 
         <section class="panel result-panel">
@@ -127,15 +79,12 @@
           <div class="result-grid">
             <article class="result-card">
               <h3>Custos</h3>
-              <div class="line-item"><span>Filamento</span><strong id="filamentCostOut">R$ 0,00</strong></div>
-              <div class="line-item"><span>Energia</span><strong id="energyCostOut">R$ 0,00</strong></div>
-              <div class="line-item"><span>Máquina (depreciação)</span><strong id="machineCostOut">R$ 0,00</strong></div>
-              <div class="line-item"><span>Mão de obra</span><strong id="laborCostOut">R$ 0,00</strong></div>
-              <div class="line-item"><span>Falhas/reimpressões</span><strong id="failureCostOut">R$ 0,00</strong></div>
-              <div class="line-item"><span>Taxas de venda</span><strong id="salesFeeOut">R$ 0,00</strong></div>
-              <div class="line-item"><span>Embalagem</span><strong id="packagingOut">R$ 0,00</strong></div>
-              <div class="line-item"><span>Outros variáveis</span><strong id="extraOut">R$ 0,00</strong></div>
-              <div class="line-item total"><span>Custo total sustentável</span><strong id="totalCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span class="cost-label cost-filament"><span class="dot"></span>Filamento</span><strong id="filamentCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span class="cost-label cost-energy"><span class="dot"></span>Energia</span><strong id="energyCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span class="cost-label cost-machine"><span class="dot"></span>Máquina (depreciação)</span><strong id="machineCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span class="cost-label cost-labor"><span class="dot"></span>Mão de obra</span><strong id="laborCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span class="cost-label cost-failure"><span class="dot"></span>Falhas/reimpressões</span><strong id="failureCostOut">R$ 0,00</strong></div>
+              <div class="line-item total"><span>Custo Total</span><strong id="totalCostOut">R$ 0,00</strong></div>
             </article>
 
             <article class="result-card">
@@ -143,44 +92,46 @@
               <div class="donut-wrap">
                 <div id="costDonut" class="donut" role="img" aria-label="Distribuição percentual de custos"></div>
               </div>
-              <ul id="legend" class="legend"></ul>
             </article>
           </div>
 
           <div class="price-strip">
-            <div class="metric highlight">
-              <span>Preço sustentável</span>
-              <strong id="sustainablePriceOut">R$ 0,00</strong>
+            <div class="metric metric-minimum">
+              <span>Preço mínimo</span>
+              <strong id="minimumPriceOut">R$ 0,00</strong>
+              <div class="metric-subline">
+                <small>Lucro</small>
+                <strong id="minimumProfitOut">R$ 0,00</strong>
+              </div>
             </div>
-            <div class="metric final">
-              <span>Preço personalizado/urgente</span>
+            <div class="metric metric-standard">
+              <span>Preço Padrão</span>
+              <strong id="salePriceOut">R$ 0,00</strong>
+              <div class="metric-subline">
+                <small>Lucro</small>
+                <strong id="saleProfitOut">R$ 0,00</strong>
+              </div>
+            </div>
+            <div class="metric metric-custom">
+              <span>Preço Personalizado</span>
               <strong id="customPriceOut">R$ 0,00</strong>
-            </div>
-            <div class="metric">
-              <span>Lucro no sustentável</span>
-              <strong id="profitValueOut">R$ 0,00</strong>
-            </div>
-            <div class="metric">
-              <span>Margem no sustentável</span>
-              <strong id="profitMarginOut">0,00%</strong>
-            </div>
-            <div class="metric">
-              <span>Custo máquina por hora</span>
-              <strong id="machineCostPerHourOut">R$ 0,00</strong>
+              <div class="metric-subline">
+                <small>Lucro</small>
+                <strong id="customProfitOut">R$ 0,00</strong>
+              </div>
             </div>
           </div>
 
-          <div class="market-note">
-            <h3>Nota de mercado</h3>
-            <p>
-              O preço calculado garante sustentabilidade da operação, mas não garante aceitação do
-              mercado. Evite baixar margem automaticamente quando o preço parecer alto.
-            </p>
-            <ul>
-              <li>Revise tempo de acabamento, modelo e fluxo de entrega.</li>
-              <li>Avalie material, calibração da impressora e diferenciação do produto.</li>
-              <li>Use preço personalizado para urgência, alterações e risco técnico maior.</li>
-            </ul>
+          <div class="metric bulk-highlight">
+            <span>Acima de 10 unidades</span>
+            <strong id="bulkPriceOut">R$ 0,00</strong>
+            <div class="metric-subline">
+              <small>Desconto de 25%</small>
+            </div>
+            <div class="metric-subline">
+              <small>Lucro por peça</small>
+              <strong id="bulkProfitOut">R$ 0,00</strong>
+            </div>
           </div>
 
           <p id="warning" class="warning" hidden></p>
