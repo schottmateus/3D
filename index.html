@@ -14,7 +14,7 @@
 
       <section class="layout">
         <form id="pricing-form" class="panel form-panel" autocomplete="off">
-          <h2>Dados da impressão</h2>
+          <h2>Dados da Impressão</h2>
 
           <div class="grid">
             <label>
@@ -41,6 +41,25 @@
             <label>
               Tempo de impressão (horas inteiras)
               <input id="printHours" type="number" min="0" step="1" />
+            </label>
+          </div>
+
+          <h2>Dimensões do Modelo (Fatiador)</h2>
+
+          <div class="grid dimensions-grid">
+            <label>
+              X (mm)
+              <input id="modelHeightMm" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Y (mm)
+              <input id="modelWidthMm" type="number" min="0" step="0.01" />
+            </label>
+
+            <label>
+              Z (mm)
+              <input id="modelLengthMm" type="number" min="0" step="0.01" />
             </label>
           </div>
 
@@ -74,14 +93,14 @@
         </form>
 
         <section class="panel result-panel">
-          <h2>Resumo da precificação</h2>
+          <h2>Resumo da Precificação</h2>
 
           <div class="result-grid">
             <article class="result-card">
               <h3>Custos</h3>
               <div class="line-item"><span class="cost-label cost-filament"><span class="dot"></span>Filamento</span><strong id="filamentCostOut">R$ 0,00</strong></div>
               <div class="line-item"><span class="cost-label cost-energy"><span class="dot"></span>Energia</span><strong id="energyCostOut">R$ 0,00</strong></div>
-              <div class="line-item"><span class="cost-label cost-machine"><span class="dot"></span>Máquina (depreciação)</span><strong id="machineCostOut">R$ 0,00</strong></div>
+              <div class="line-item"><span class="cost-label cost-machine"><span class="dot"></span>Máquina (Depreciação)</span><strong id="machineCostOut">R$ 0,00</strong></div>
               <div class="line-item"><span class="cost-label cost-labor"><span class="dot"></span>Mão de obra</span><strong id="laborCostOut">R$ 0,00</strong></div>
               <div class="line-item"><span class="cost-label cost-failure"><span class="dot"></span>Falhas/reimpressões</span><strong id="failureCostOut">R$ 0,00</strong></div>
               <div class="line-item total"><span>Custo Total</span><strong id="totalCostOut">R$ 0,00</strong></div>
@@ -94,6 +113,13 @@
               </div>
             </article>
           </div>
+
+          <article class="result-card dimensions-card">
+            <h3>Dimensões do Modelo (cm)</h3>
+            <div class="line-item"><span>Largura</span><strong id="modelWidthCmOut">0,0 cm</strong></div>
+            <div class="line-item"><span>Comprimento</span><strong id="modelLengthCmOut">0,0 cm</strong></div>
+            <div class="line-item"><span>Altura</span><strong id="modelHeightCmOut">0,0 cm</strong></div>
+          </article>
 
           <div class="price-strip">
             <div class="metric metric-minimum">
