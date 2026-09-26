@@ -8,6 +8,11 @@ const percentFormatter = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 2,
 });
 
+const dimensionFormatter = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
+
 const KOBRA_X_POWER_W = 400;
 const RGE_SANTA_MARIA_RATE_PER_KWH = 1.3461;
 const PRINTER_VALUE_BRL = 3500;
@@ -25,6 +30,9 @@ const fields = {
   filamentType: document.getElementById("filamentType"),
   filamentCostPerKg: document.getElementById("filamentCostPerKg"),
   printHours: document.getElementById("printHours"),
+  modelHeightMm: document.getElementById("modelHeightMm"),
+  modelWidthMm: document.getElementById("modelWidthMm"),
+  modelLengthMm: document.getElementById("modelLengthMm"),
   manualWorkMinutes: document.getElementById("manualWorkMinutes"),
   hourlyRate: document.getElementById("hourlyRate"),
 };
@@ -55,6 +63,9 @@ const outputs = {
   fixedMinimumRuleOut: document.getElementById("fixedMinimumRuleOut"),
   fixedSaleRuleOut: document.getElementById("fixedSaleRuleOut"),
   fixedCustomRuleOut: document.getElementById("fixedCustomRuleOut"),
+  modelHeightCmOut: document.getElementById("modelHeightCmOut"),
+  modelWidthCmOut: document.getElementById("modelWidthCmOut"),
+  modelLengthCmOut: document.getElementById("modelLengthCmOut"),
 };
 
 const defaults = {
@@ -62,6 +73,9 @@ const defaults = {
   filamentType: "PLA",
   filamentCostPerKg: 79.9,
   printHours: 8,
+  modelHeightMm: 0,
+  modelWidthMm: 0,
+  modelLengthMm: 0,
   manualWorkMinutes: 40,
   hourlyRate: 25,
 };
@@ -80,6 +94,11 @@ function money(value) {
   return currencyFormatter.format(Number.isFinite(value) ? value : 0);
 }
 
+function dimensionCm(valueMm) {
+  const value = Number.isFinite(valueMm) ? valueMm / 10 : 0;
+  return `${dimensionFormatter.format(value)} cm`;
+}
+
 function readForm() {
   const hours = Math.max(0, Math.floor(toNumber(fields.printHours.value)));
 
@@ -88,6 +107,9 @@ function readForm() {
     filamentType: fields.filamentType.value,
     filamentCostPerKg: Math.max(0, toNumber(fields.filamentCostPerKg.value)),
     printHours: hours,
+    modelHeightMm: Math.max(0, toNumber(fields.modelHeightMm.value)),
+    modelWidthMm: Math.max(0, toNumber(fields.modelWidthMm.value)),
+    modelLengthMm: Math.max(0, toNumber(fields.modelLengthMm.value)),
     manualWorkMinutes: Math.max(0, toNumber(fields.manualWorkMinutes.value)),
     hourlyRate: Math.max(0, toNumber(fields.hourlyRate.value)),
   };
@@ -224,6 +246,9 @@ function calculate() {
   outputs.minimumProfitOut.textContent = money(minimumProfitValue);
   outputs.saleProfitOut.textContent = money(saleProfitValue);
   outputs.customProfitOut.textContent = money(customProfitValue);
+  outputs.modelHeightCmOut.textContent = dimensionCm(values.modelLengthMm);
+  outputs.modelWidthCmOut.textContent = dimensionCm(values.modelHeightMm);
+  outputs.modelLengthCmOut.textContent = dimensionCm(values.modelWidthMm);
 
   updateDonut(
     [

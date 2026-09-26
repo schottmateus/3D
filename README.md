@@ -23,6 +23,8 @@ Start-Process .\index.html
 
 - cálculo automático em tempo real
 - resumo de custos por categoria
+- campos de altura, largura e comprimento em mm (dados do fatiador)
+- exibição automática das dimensões no resumo em cm com 1 casa decimal
 - três preços no relatório: mínimo, venda e personalizado
 - lucro exibido ao lado de cada preço
 - destaque para preço acima de 10 unidades
