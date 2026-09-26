@@ -11,23 +11,22 @@ const percentFormatter = new Intl.NumberFormat("pt-BR", {
 const KOBRA_X_POWER_W = 400;
 const RGE_SANTA_MARIA_RATE_PER_KWH = 1.3461;
 const PRINTER_VALUE_BRL = 3500;
+const MAINTENANCE_RESERVE_BRL = 500;
+const USEFUL_LIFE_HOURS = 5000;
+const FAILURE_RATE_PERCENT = 7;
+const BASE_SALE_PROFIT_PERCENT = 100;
+const MINIMUM_DISCOUNT_PERCENT = 15;
+const CUSTOM_ADDITIONAL_PERCENT = 5;
+const BULK_DISCOUNT_PERCENT = 25;
+const ROUNDING_MODE = "integer";
 
 const fields = {
   filamentConsumption: document.getElementById("filamentConsumption"),
   filamentType: document.getElementById("filamentType"),
   filamentCostPerKg: document.getElementById("filamentCostPerKg"),
   printHours: document.getElementById("printHours"),
-  salesFeePercent: document.getElementById("salesFeePercent"),
-  packagingCost: document.getElementById("packagingCost"),
-  extraCost: document.getElementById("extraCost"),
-  maintenanceReserve: document.getElementById("maintenanceReserve"),
-  usefulLifeHours: document.getElementById("usefulLifeHours"),
-  failureRatePercent: document.getElementById("failureRatePercent"),
   manualWorkMinutes: document.getElementById("manualWorkMinutes"),
   hourlyRate: document.getElementById("hourlyRate"),
-  desiredProfitPercent: document.getElementById("desiredProfitPercent"),
-  customPremiumPercent: document.getElementById("customPremiumPercent"),
-  roundingMode: document.getElementById("roundingMode"),
 };
 
 const outputs = {
@@ -36,21 +35,26 @@ const outputs = {
   machineCostOut: document.getElementById("machineCostOut"),
   laborCostOut: document.getElementById("laborCostOut"),
   failureCostOut: document.getElementById("failureCostOut"),
-  salesFeeOut: document.getElementById("salesFeeOut"),
-  packagingOut: document.getElementById("packagingOut"),
-  extraOut: document.getElementById("extraOut"),
   totalCostOut: document.getElementById("totalCostOut"),
-  sustainablePriceOut: document.getElementById("sustainablePriceOut"),
+  minimumPriceOut: document.getElementById("minimumPriceOut"),
+  salePriceOut: document.getElementById("salePriceOut"),
   customPriceOut: document.getElementById("customPriceOut"),
-  profitValueOut: document.getElementById("profitValueOut"),
-  profitMarginOut: document.getElementById("profitMarginOut"),
-  machineCostPerHourOut: document.getElementById("machineCostPerHourOut"),
+  bulkPriceOut: document.getElementById("bulkPriceOut"),
+  bulkProfitOut: document.getElementById("bulkProfitOut"),
+  minimumProfitOut: document.getElementById("minimumProfitOut"),
+  saleProfitOut: document.getElementById("saleProfitOut"),
+  customProfitOut: document.getElementById("customProfitOut"),
   warning: document.getElementById("warning"),
   donut: document.getElementById("costDonut"),
-  legend: document.getElementById("legend"),
   fixedPowerOut: document.getElementById("fixedPowerOut"),
   fixedRateOut: document.getElementById("fixedRateOut"),
   fixedPrinterValueOut: document.getElementById("fixedPrinterValueOut"),
+  fixedReserveOut: document.getElementById("fixedReserveOut"),
+  fixedUsefulLifeOut: document.getElementById("fixedUsefulLifeOut"),
+  fixedFailureRateOut: document.getElementById("fixedFailureRateOut"),
+  fixedMinimumRuleOut: document.getElementById("fixedMinimumRuleOut"),
+  fixedSaleRuleOut: document.getElementById("fixedSaleRuleOut"),
+  fixedCustomRuleOut: document.getElementById("fixedCustomRuleOut"),
 };
 
 const defaults = {
@@ -58,17 +62,8 @@ const defaults = {
   filamentType: "PLA",
   filamentCostPerKg: 79.9,
   printHours: 8,
-  salesFeePercent: 16.4,
-  packagingCost: 1.2,
-  extraCost: 0.0,
-  maintenanceReserve: 500,
-  usefulLifeHours: 5000,
-  failureRatePercent: 7,
   manualWorkMinutes: 40,
   hourlyRate: 25,
-  desiredProfitPercent: 30,
-  customPremiumPercent: 20,
-  roundingMode: "90",
 };
 
 const STORAGE_KEY = "pricing-3d-calculator-state";
@@ -81,38 +76,20 @@ function toNumber(value) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
-
 function money(value) {
   return currencyFormatter.format(Number.isFinite(value) ? value : 0);
 }
 
-function percentage(value) {
-  return `${percentFormatter.format(Number.isFinite(value) ? value : 0)}%`;
-}
-
 function readForm() {
   const hours = Math.max(0, Math.floor(toNumber(fields.printHours.value)));
-  const salesFeePercent = clamp(toNumber(fields.salesFeePercent.value), 0, 99.99);
 
   return {
     filamentConsumption: Math.max(0, toNumber(fields.filamentConsumption.value)),
     filamentType: fields.filamentType.value,
     filamentCostPerKg: Math.max(0, toNumber(fields.filamentCostPerKg.value)),
     printHours: hours,
-    salesFeePercent,
-    packagingCost: Math.max(0, toNumber(fields.packagingCost.value)),
-    extraCost: Math.max(0, toNumber(fields.extraCost.value)),
-    maintenanceReserve: Math.max(0, toNumber(fields.maintenanceReserve.value)),
-    usefulLifeHours: Math.max(1, Math.floor(toNumber(fields.usefulLifeHours.value))),
-    failureRatePercent: Math.max(0, toNumber(fields.failureRatePercent.value)),
     manualWorkMinutes: Math.max(0, toNumber(fields.manualWorkMinutes.value)),
     hourlyRate: Math.max(0, toNumber(fields.hourlyRate.value)),
-    desiredProfitPercent: Math.max(0, toNumber(fields.desiredProfitPercent.value)),
-    customPremiumPercent: Math.max(0, toNumber(fields.customPremiumPercent.value)),
-    roundingMode: fields.roundingMode.value,
   };
 }
 
@@ -134,57 +111,59 @@ function applyRounding(value, mode) {
   return value;
 }
 
-function priceFromNet(netValue, salesFeeRate) {
-  if (salesFeeRate >= 1) {
-    return 0;
-  }
-  return netValue / (1 - salesFeeRate);
-}
-
-function buildLegendItems(parts, total) {
-  return parts
-    .filter((item) => item.value > 0)
-    .map((item) => {
-      const share = total > 0 ? (item.value / total) * 100 : 0;
-      return `<li><label><span class="dot" style="background:${item.color}"></span>${item.label}</label><strong>${percentage(share)}</strong></li>`;
-    })
-    .join("");
-}
-
 function updateDonut(parts, total) {
+  outputs.donut.querySelectorAll(".pie-label").forEach((label) => label.remove());
+
   if (total <= 0) {
     outputs.donut.style.background = "conic-gradient(#274678 0deg 360deg)";
-    outputs.legend.innerHTML = "<li><span>Sem custos informados</span><strong>0,00%</strong></li>";
     return;
   }
 
   let cumulative = 0;
-  const slices = parts
+  const activeParts = parts
     .filter((item) => item.value > 0)
     .map((item) => {
+      const share = (item.value / total) * 100;
       const angle = (item.value / total) * 360;
       const start = cumulative;
       cumulative += angle;
-      return `${item.color} ${start.toFixed(3)}deg ${cumulative.toFixed(3)}deg`;
+      return {
+        label: item.label,
+        color: item.color,
+        share,
+        start,
+        end: cumulative,
+      };
     });
 
+  const slices = activeParts
+    .map((item) => `${item.color} ${item.start.toFixed(3)}deg ${item.end.toFixed(3)}deg`);
+
   outputs.donut.style.background = `conic-gradient(${slices.join(", ")})`;
-  outputs.legend.innerHTML = buildLegendItems(parts, total);
+
+  activeParts.forEach((item) => {
+    const midAngleDeg = (item.start + item.end) / 2 - 90;
+    const midAngle = (midAngleDeg * Math.PI) / 180;
+    const radiusPercent = 36;
+    const left = 50 + Math.cos(midAngle) * radiusPercent;
+    const top = 50 + Math.sin(midAngle) * radiusPercent;
+
+    const label = document.createElement("span");
+    label.className = "pie-label";
+    label.textContent = `${percentFormatter.format(item.share)}%`;
+    label.style.left = `${left}%`;
+    label.style.top = `${top}%`;
+    outputs.donut.appendChild(label);
+  });
 }
 
 function calculate() {
   const values = readForm();
   const printTimeHours = values.printHours;
-  const salesFeeRate = values.salesFeePercent / 100;
-  const failureRate = values.failureRatePercent / 100;
-  const profitRate = values.desiredProfitPercent / 100;
-  const customPremiumRate = values.customPremiumPercent / 100;
-
-  if (salesFeeRate >= 1) {
-    outputs.warning.hidden = false;
-    outputs.warning.textContent = "A taxa de venda deve ser menor que 100%.";
-    return;
-  }
+  const failureRate = FAILURE_RATE_PERCENT / 100;
+  const saleProfitRate = BASE_SALE_PROFIT_PERCENT / 100;
+  const minimumDiscountRate = MINIMUM_DISCOUNT_PERCENT / 100;
+  const customAdditionalRate = CUSTOM_ADDITIONAL_PERCENT / 100;
 
   outputs.warning.hidden = true;
   outputs.warning.textContent = "";
@@ -192,43 +171,59 @@ function calculate() {
   const filamentCost = (values.filamentConsumption / 1000) * values.filamentCostPerKg;
   const energyCost =
     (KOBRA_X_POWER_W / 1000) * printTimeHours * RGE_SANTA_MARIA_RATE_PER_KWH;
-  const machineCostPerHour = (PRINTER_VALUE_BRL + values.maintenanceReserve) / values.usefulLifeHours;
+  const machineCostPerHour = (PRINTER_VALUE_BRL + MAINTENANCE_RESERVE_BRL) / USEFUL_LIFE_HOURS;
   const machineCost = machineCostPerHour * printTimeHours;
   const laborCost = (values.manualWorkMinutes / 60) * values.hourlyRate;
 
-  const variableCost = filamentCost + energyCost + values.packagingCost + values.extraCost;
-  const sustainableBaseCost = variableCost + machineCost + laborCost;
+  const sustainableBaseCost = filamentCost + energyCost + machineCost + laborCost;
   const failureCost = sustainableBaseCost * failureRate;
   const sustainableCostWithFailures = sustainableBaseCost + failureCost;
 
-  const sustainableNetTarget = sustainableCostWithFailures * (1 + profitRate);
-  const sustainablePrice = applyRounding(
-    priceFromNet(sustainableNetTarget, salesFeeRate),
-    values.roundingMode,
-  );
-  const customPrice = applyRounding(sustainablePrice * (1 + customPremiumRate), values.roundingMode);
+  const salePriceRaw = sustainableCostWithFailures * (1 + saleProfitRate);
+  const minimumPriceRaw = salePriceRaw * (1 - minimumDiscountRate);
+  const customPriceRaw = salePriceRaw * (1 + customAdditionalRate);
+  const bulkPriceRaw = salePriceRaw * (1 - BULK_DISCOUNT_PERCENT / 100);
 
-  const sustainableSalesFee = sustainablePrice * salesFeeRate;
-  const sustainableTotalCost = sustainableCostWithFailures + sustainableSalesFee;
-  const sustainableProfitValue = sustainablePrice - sustainableTotalCost;
-  const sustainableProfitMargin =
-    sustainablePrice > 0 ? (sustainableProfitValue / sustainablePrice) * 100 : 0;
+  let minimumPrice = applyRounding(minimumPriceRaw, ROUNDING_MODE);
+  const salePrice = applyRounding(salePriceRaw, ROUNDING_MODE);
+  let customPrice = applyRounding(customPriceRaw, ROUNDING_MODE);
+  const bulkPrice = applyRounding(bulkPriceRaw, ROUNDING_MODE);
+
+  if (minimumPrice >= salePrice && salePrice > 0) {
+    minimumPrice = Math.max(0, salePrice - 1);
+  }
+
+  if (customPrice <= salePrice) {
+    if (ROUNDING_MODE === "integer") {
+      customPrice = salePrice + 1;
+    } else if (ROUNDING_MODE === "90") {
+      customPrice = applyRounding(salePrice + 1, ROUNDING_MODE);
+    } else {
+      customPrice = salePrice + 0.01;
+    }
+  }
+
+  const sustainableTotalCost = sustainableCostWithFailures;
+  const minimumProfitValue = minimumPrice - sustainableCostWithFailures;
+  const saleProfitValue = salePrice - sustainableCostWithFailures;
+  const customProfitValue = customPrice - sustainableCostWithFailures;
+  const bulkProfitValue = bulkPrice - sustainableCostWithFailures;
 
   outputs.filamentCostOut.textContent = money(filamentCost);
   outputs.energyCostOut.textContent = money(energyCost);
   outputs.machineCostOut.textContent = money(machineCost);
   outputs.laborCostOut.textContent = money(laborCost);
   outputs.failureCostOut.textContent = money(failureCost);
-  outputs.salesFeeOut.textContent = money(sustainableSalesFee);
-  outputs.packagingOut.textContent = money(values.packagingCost);
-  outputs.extraOut.textContent = money(values.extraCost);
   outputs.totalCostOut.textContent = money(sustainableTotalCost);
 
-  outputs.sustainablePriceOut.textContent = money(sustainablePrice);
+  outputs.minimumPriceOut.textContent = money(minimumPrice);
+  outputs.salePriceOut.textContent = money(salePrice);
   outputs.customPriceOut.textContent = money(customPrice);
-  outputs.profitValueOut.textContent = money(sustainableProfitValue);
-  outputs.profitMarginOut.textContent = percentage(sustainableProfitMargin);
-  outputs.machineCostPerHourOut.textContent = `${money(machineCostPerHour)}/h`;
+  outputs.bulkPriceOut.textContent = money(bulkPrice);
+  outputs.bulkProfitOut.textContent = money(bulkProfitValue);
+  outputs.minimumProfitOut.textContent = money(minimumProfitValue);
+  outputs.saleProfitOut.textContent = money(saleProfitValue);
+  outputs.customProfitOut.textContent = money(customProfitValue);
 
   updateDonut(
     [
@@ -237,9 +232,6 @@ function calculate() {
       { label: "Máquina", value: machineCost, color: "#6ba8ff" },
       { label: "Mão de obra", value: laborCost, color: "#be89ff" },
       { label: "Falhas", value: failureCost, color: "#ff7a7a" },
-      { label: "Taxas", value: sustainableSalesFee, color: "#62d0ff" },
-      { label: "Embalagem", value: values.packagingCost, color: "#90a9d6" },
-      { label: "Outros", value: values.extraCost, color: "#e6a15a" },
     ],
     sustainableTotalCost,
   );
@@ -283,4 +275,10 @@ loadState();
 outputs.fixedPowerOut.textContent = `${KOBRA_X_POWER_W} W`;
 outputs.fixedRateOut.textContent = `${money(RGE_SANTA_MARIA_RATE_PER_KWH)}/kWh`;
 outputs.fixedPrinterValueOut.textContent = money(PRINTER_VALUE_BRL);
+outputs.fixedReserveOut.textContent = money(MAINTENANCE_RESERVE_BRL);
+outputs.fixedUsefulLifeOut.textContent = `${USEFUL_LIFE_HOURS} h`;
+outputs.fixedFailureRateOut.textContent = `${FAILURE_RATE_PERCENT}%`;
+outputs.fixedMinimumRuleOut.textContent = "(Preço de venda - 15%)";
+outputs.fixedSaleRuleOut.textContent = "(Custo + 100%)";
+outputs.fixedCustomRuleOut.textContent = "(Preço de venda + 5%)";
 calculate();
